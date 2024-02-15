@@ -1,24 +1,45 @@
-import logo from './logo.svg';
 import './App.css';
-
+import VideoPlayer from './VideoPlayer';
+import { createContext, useCallback, useEffect, useState } from 'react';
+import { Data } from './Data';
+import PlayList from './PlayList';
+import styled from 'styled-components';
+const StyledDiv = styled.div`
+display: flex;
+`;
+export const Context = createContext()
 function App() {
+  const [playListVideos, setPlayListVideos] = useState()
+  const [selectedVideo, setSelectedVideo] = useState()
+  const getTheData = useCallback(async () => {
+    const result = Data();
+    const video = result?.categories[0]?.videos.sort();
+    setPlayListVideos(video)
+  }, [])
+  useEffect(() => {
+    getTheData()
+    // eslint-disable-next-line
+  }, [])
+  const [commenData, setCommonData] = useState({
+    autoPlay: false
+  })
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <StyledDiv className='continer'>
+      <Context.Provider value={commenData}>
+        <VideoPlayer selectedVideo={selectedVideo}
+          playListVideos={playListVideos}>
+
+        </VideoPlayer>
+        <PlayList 
+          playListVideos={playListVideos}
+          setSelectedVideo={setSelectedVideo}
+          selectedVideo={selectedVideo}
+          setCommonData={setCommonData}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+        </PlayList>
+      </Context.Provider>
+    </StyledDiv>
   );
 }
 
