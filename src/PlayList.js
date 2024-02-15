@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import SearchBar from "material-ui-search-bar";
 import styled from "styled-components";
-import NowPlayingComponent from "./NowPlaying";
+import NowPlayingComponent from "./NowPlaying";;
 
 const StyledPlayListContiner = styled.div`
   height: 90%;
@@ -33,26 +33,36 @@ const StyledPlayListCard = styled.div`
   background-color: #f5dcdc99;
 `;
 const StyledImg = styled.img`
-height:100%`;
+height:100%;
+width: 100%;
+`;
 const DetailsDiv = styled.div`
-margin-left:2%
+margin-left:5%;
+width:100%
 `
 
 const PlayList = (props) => {
-    const { playListVideos, setSelectedVideo, playedChildIndex, slectedVideo } = props;
+    const { playListVideos, setSelectedVideo, selectedVideo, setCommonData } = props;
     const [changedPlayaList, setChangedPlayList] = useState()
     const [dragId, setDragId] = useState();
-    const[playList,setPlayList]=useState()
-    const[searchList,setSearchList]=useState()
-    const onSelectVideo = useCallback((title, index) => {
-        const video = playListVideos.find((data) => data.title === title);
+    const [playList, setPlayList] = useState()
+    const [searchList, setSearchList] = useState()
+    const onSelectVideo = useCallback((title) => {
+        const video = playListVideos?.find((data) => data.title === title);
         setSelectedVideo(video);
-        // setPlayedChildIndex(index)
-    }, [playListVideos, setSelectedVideo]);
-    const handleDrag = (event) => {
+        setCommonData((pre) => ({
+            ...pre,
+            autoPlay: true
+        }))
+    }, [setSelectedVideo,setCommonData,playListVideos]);
+    const handleDrag = useCallback((event) => {
         setDragId(event.currentTarget.id);
+        setCommonData((pre) => ({
+            ...pre,
+            autoPlay: false
+        }))
 
-    };
+    }, [setCommonData]);
     const reorderPlayList = (array, fromIndex, toIndex) => {
         if (fromIndex >= 0 && fromIndex < array.length && toIndex >= 0 && toIndex <= array.length) {
             const newArray = array.slice();
@@ -64,37 +74,42 @@ const PlayList = (props) => {
             return array.slice();
         }
     }
-    const handleDrop = (event) => {
+    const handleDrop = useCallback((event) => {
         const dragItem = playList.findIndex((data) => data.title === dragId)
         const dropItem = playList.findIndex((data) => data.title === event.currentTarget.id)
         const changedArray = reorderPlayList(playList, dragItem, dropItem)
         setChangedPlayList(changedArray)
+    }, [playList, dragId, setChangedPlayList])
+    const findSearchVideo = (query) => {
+        const searchedVideos = playList.filter((videos) => (videos.title.toLowerCase()).includes(query))
+        setSearchList(searchedVideos);
     }
-    const findSearchVideo=(query)=>{
-       const searchedVideos= playList.filter((videos)=>videos.title.includes(query))
-       setSearchList(searchedVideos);
-    }
-    const onSearch = (event) => {
-        findSearchVideo(event)
-    }
-    const clearSearch=()=>{
+    const onSearch = useCallback((event) => {
+        findSearchVideo(event.toLowerCase())
+        // eslint-disable-next-line
+    }, [])
+    const clearSearch = () => {
         setSearchList([])
     }
-    useEffect(()=>{
-        if(searchList?.length>0){
+    useEffect(() => {
+        if (searchList?.length > 0) {
             setPlayList(searchList)
         }
-        else if(changedPlayaList!==undefined){
+        else if (changedPlayaList !== undefined) {
             setPlayList(changedPlayaList)
         }
-        else if(playListVideos?.length>0){
+        else if (playListVideos?.length > 0) {
             setPlayList(playListVideos)
         }
-    },[searchList,changedPlayaList,playListVideos])
-    console.log(slectedVideo,"###")
+    }, [searchList, changedPlayaList, playListVideos])
+    const handelkeyDown = useCallback((event) => {
+        if (event.key === "Backspace") {
+            setSearchList([])
+        }
+    }, [])
     return (
         <StyledPlayListContiner className="playerListContiner">
-            <SearchBar  onRequestSearch={onSearch} onCancelSearch={clearSearch}/>
+            <SearchBar onRequestSearch={onSearch} onCancelSearch={clearSearch} onChange={onSearch} onKeyDown={handelkeyDown} />
             <StyledListItems className="listItems">
                 {playList?.map((videoData, index) => (
                     <StyledPlayListCard
@@ -107,14 +122,14 @@ const PlayList = (props) => {
                         onDragStart={handleDrag}
                         onDrop={handleDrop}
                     >
-                        <div>
+                        <div style={{ width: "150%" }}>
                             <StyledImg src={videoData?.thumb} alt={videoData.title} />
                         </div>
                         <DetailsDiv>
                             <h4 style={{ margin: "0px" }}>{videoData.title} </h4>
                             <h5 style={{ margin: "1px" }}><i>{`[${videoData.subtitle}]`}</i></h5>
-                            {videoData?.title === slectedVideo?.title ? <NowPlayingComponent /> : <></>}
                         </DetailsDiv>
+                        {videoData?.title === selectedVideo?.title ? <NowPlayingComponent /> : <></>}
                     </StyledPlayListCard>
                 ))}
             </StyledListItems>

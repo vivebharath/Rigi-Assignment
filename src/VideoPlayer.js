@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-// import './VideoPlayer.css';
+import React, { useContext, useEffect, useState } from "react";
 import ReactPlayer from 'react-player';
 import styled from "styled-components";
+import { Context } from "./App";
 const VideoPlayerContainer = styled.div`
   max-height: 98vh;
   width: 80%;
@@ -34,24 +34,45 @@ const VideoPlayerContainer = styled.div`
   }
 `;
 const VideoPlayer = (props) => {
-    const { slectedVideo, playListVideos } = props
-    const [tragetVideo, setTargetVideo] = useState()
-    useEffect(() => {
-        playListVideos && setTargetVideo(slectedVideo !== undefined ? slectedVideo : playListVideos[0])
-    }, [slectedVideo, playListVideos])
-    return (
-        <VideoPlayerContainer className="videoPlayerContiner">
-            <ReactPlayer
-                url={tragetVideo?.sources[0]}
-                controls
-                width="100%"
-                height="80%"
-                playing={true}
-                muted={true} 
-            ></ReactPlayer>
-            <h2 >{`${tragetVideo?.title}[${tragetVideo?.subtitle}]`}</h2>
-            <p><i>{tragetVideo?.description}</i></p>
-        </VideoPlayerContainer>
-    )
-}
-export default VideoPlayer
+  const { selectedVideo, playListVideos } = props;
+  const [targetVideoIndex, setTargetVideoIndex] = useState(0);
+  const commonValue = useContext(Context)
+  console.log(commonValue, "#Video")
+
+  useEffect(() => {
+    setTargetVideoIndex(
+      selectedVideo !== undefined ? playListVideos.findIndex((video) => video.title === selectedVideo.title) : 0
+    );
+  }, [selectedVideo, playListVideos]);
+
+  const handleVideoEnded = () => {
+    setTargetVideoIndex((prevIndex) => (prevIndex + 1) % (playListVideos?.length || 1));
+  };
+
+  const targetVideo = playListVideos?.[targetVideoIndex];
+  return (
+    <VideoPlayerContainer className="videoPlayerContiner">
+      {targetVideo && targetVideo.sources && targetVideo.sources[0] ? (
+        <ReactPlayer
+          url={targetVideo.sources[0]}
+          controls
+          width="100%"
+          height="80%"
+          playing={commonValue.autoPlay}
+          muted={true}
+          onEnded={handleVideoEnded}
+        />
+      ) : null}
+      {targetVideo ? (
+        <>
+          <h2>{`${targetVideo.title}[${targetVideo.subtitle}]`}</h2>
+          <p>
+            <i>{targetVideo.description}</i>
+          </p>
+        </>
+      ) : null}
+    </VideoPlayerContainer>
+  );
+};
+
+export default VideoPlayer;

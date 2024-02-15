@@ -1,16 +1,16 @@
-// import './App.css';
+import './App.css';
 import VideoPlayer from './VideoPlayer';
-import { useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import { Data } from './Data';
 import PlayList from './PlayList';
 import styled from 'styled-components';
 const StyledDiv = styled.div`
 display: flex;
 `;
+export const Context = createContext()
 function App() {
   const [playListVideos, setPlayListVideos] = useState()
-  const [slectedVideo, setSelectedVideo] = useState()
-  const [playedChildIndex, setPlayedChildIndex] = useState(0)
+  const [selectedVideo, setSelectedVideo] = useState()
   const getTheData = useCallback(async () => {
     const result = Data();
     const video = result?.categories[0]?.videos.sort();
@@ -18,11 +18,27 @@ function App() {
   }, [])
   useEffect(() => {
     getTheData()
+    // eslint-disable-next-line
   }, [])
+  const [commenData, setCommonData] = useState({
+    autoPlay: false
+  })
   return (
     <StyledDiv className='continer'>
-      <VideoPlayer slectedVideo={slectedVideo} playListVideos={playListVideos}></VideoPlayer>
-      <PlayList playListVideos={playListVideos} setSelectedVideo={setSelectedVideo} playedChildIndex={playedChildIndex} setPlayedChildIndex={setPlayedChildIndex} slectedVideo={slectedVideo}></PlayList>
+      <Context.Provider value={commenData}>
+        <VideoPlayer selectedVideo={selectedVideo}
+          playListVideos={playListVideos}>
+
+        </VideoPlayer>
+        <PlayList 
+          playListVideos={playListVideos}
+          setSelectedVideo={setSelectedVideo}
+          selectedVideo={selectedVideo}
+          setCommonData={setCommonData}
+        >
+
+        </PlayList>
+      </Context.Provider>
     </StyledDiv>
   );
 }
