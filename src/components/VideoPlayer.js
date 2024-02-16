@@ -37,7 +37,6 @@ const VideoPlayer = (props) => {
   const { selectedVideo, playListVideos } = props;
   const [targetVideoIndex, setTargetVideoIndex] = useState(0);
   const commonValue = useContext(Context)
-  console.log(commonValue, "#Video")
 
   useEffect(() => {
     setTargetVideoIndex(
