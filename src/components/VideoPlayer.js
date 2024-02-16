@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import ReactPlayer from 'react-player';
 import styled from "styled-components";
-import { Context } from "./App";
+import { Context } from "../App";
 const VideoPlayerContainer = styled.div`
   max-height: 98vh;
   width: 80%;

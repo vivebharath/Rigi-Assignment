@@ -81,7 +81,7 @@ const PlayList = (props) => {
         setChangedPlayList(changedArray)
     }, [playList, dragId, setChangedPlayList])
     const findSearchVideo = (query) => {
-        const searchedVideos = playList.filter((videos) => (videos.title.toLowerCase()).includes(query))
+        const searchedVideos = playList?.filter((videos) => (videos.title.toLowerCase()).includes(query))
         setSearchList(searchedVideos);
     }
     const onSearch = useCallback((event) => {

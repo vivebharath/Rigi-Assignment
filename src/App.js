@@ -1,9 +1,9 @@
 import './App.css';
-import VideoPlayer from './VideoPlayer';
 import { createContext, useCallback, useEffect, useState } from 'react';
-import { Data } from './Data';
-import PlayList from './PlayList';
+import { Data } from './data/Data';
+import PlayList from './components/PlayList';
 import styled from 'styled-components';
+import VideoPlayer from './components/VideoPlayer';
 const StyledDiv = styled.div`
 display: flex;
 `;
