@@ -54,7 +54,7 @@ const PlayList = (props) => {
             ...pre,
             autoPlay: true
         }))
-    }, [setSelectedVideo,setCommonData,playListVideos]);
+    }, [setSelectedVideo, setCommonData, playListVideos]);
     const handleDrag = useCallback((event) => {
         setDragId(event.currentTarget.id);
         setCommonData((pre) => ({
@@ -80,10 +80,13 @@ const PlayList = (props) => {
         const changedArray = reorderPlayList(playList, dragItem, dropItem)
         setChangedPlayList(changedArray)
     }, [playList, dragId, setChangedPlayList])
-    const findSearchVideo = (query) => {
-        const searchedVideos = playList.filter((videos) => (videos.title.toLowerCase()).includes(query))
+    const findSearchVideo = useCallback((query) => {
+        console.log(playList, "fhjfhfhk")
+        const searchedVideos = playList?.filter((videos) =>
+            videos.title.toLowerCase().includes(query)
+        );
         setSearchList(searchedVideos);
-    }
+    },[playList]);
     const onSearch = useCallback((event) => {
         findSearchVideo(event.toLowerCase())
         // eslint-disable-next-line
@@ -91,6 +94,11 @@ const PlayList = (props) => {
     const clearSearch = () => {
         setSearchList([])
     }
+    const handelkeyDown = useCallback((event) => {
+        if (event.key === "Backspace") {
+            setSearchList([])
+        }
+    }, [])
     useEffect(() => {
         if (searchList?.length > 0) {
             setPlayList(searchList)
@@ -102,11 +110,6 @@ const PlayList = (props) => {
             setPlayList(playListVideos)
         }
     }, [searchList, changedPlayaList, playListVideos])
-    const handelkeyDown = useCallback((event) => {
-        if (event.key === "Backspace") {
-            setSearchList([])
-        }
-    }, [])
     return (
         <StyledPlayListContiner className="playerListContiner">
             <SearchBar onRequestSearch={onSearch} onCancelSearch={clearSearch} onChange={onSearch} onKeyDown={handelkeyDown} />
